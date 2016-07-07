@@ -1,0 +1,37 @@
+#include <bits/stdc++.h>
+#define For(i,a,b) for(int i=(a),_b=(b);i<=_b;++i)
+using namespace std;
+const int N = ...;
+int n;
+vector< vector<int> > g;
+// for LCA
+int par[N][20],lvl[N];
+void pre(int u,int level){
+	lvl[u]=level;
+	for(int i=0;i<g[u].size();++i){ int v=g[u][i]; if(lvl[v]) continue;
+		pre(v,level+1);
+		par[v][0]=u;
+	}
+}
+
+int lca(int u,int v){
+	if(lvl[u]>lvl[v]) swap(u,v);
+	for(int i=19;i>=0;--i) if(lvl[par[u][i]]>=lvl[v]) u=par[u][i];
+	if(u==v) return u;
+	for(int i=19;i>=0;--i) if(par[u][i]!=-1&&par[u][i]!=par[v][i]) {u=par[u][i]; v=par[v][i];}
+	return par[u][0];
+}
+int main(){
+	cin>>n;	g.assign (n+1, vector<int>() );
+	for(int i=1;i<n;++i){
+		int x,y;cin>>x>>y;	
+		g[x].push_back(y);	g[y].push_back(x);
+	}
+	memset(par, -1 ,sizeof(par));
+	pre(1,1);
+	For(j,1,19)For(i,1,n) if(par[i][j-1]!=-1) par[i][j]=par[par[i][j-1]][j-1];
+	int q;	cin>>q;
+	while (q--){
+		int x,y;cin>>x>>y;	cout<<lca(x,y);
+	}
+}
