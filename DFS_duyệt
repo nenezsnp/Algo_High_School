@@ -1,0 +1,22 @@
+#include <bits/stdc++.h>
+using namespace std;
+int n,m;
+const int N = 
+bool ck[N];
+vector< vector<int> > g;
+void dfs(int u){
+	ck[u]=1;
+	for(int i=0;i<g[u].size();++i){ int v=g[u][i]; if (ck[v]) continue;
+		dfs(v); 
+		....
+	}
+}
+int main(){
+	ios_base::sync_with_stdio(false);
+	cin>>n>>m;	g.assign(n+1, vector<int>() );
+	for(int i=1;i<=m;++i){
+		int x,y;cin>>x>>y;
+		g[x].push_back(y); g[y].push_back(x);
+	}
+	dfs(root);
+}
