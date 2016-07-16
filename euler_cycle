@@ -1,0 +1,57 @@
+// base on NKPOS spoj
+/*input
+6 7
+1
+7
+4
+10
+20
+5
+2 4
+1 5
+2 1
+4 5
+3 6
+1 6
+1 3
+*/
+#include <bits/stdc++.h>
+#define For(i,a,b) for(int i=(a),_b=(b);i<=_b;++i)
+#define nenezsnp cout<<"I LOVE NENE\n"
+using namespace std;
+const int N = 301;
+int n,m;
+int g[N][N];
+int cnt=0;
+vector<int> cycle;
+vector<int> tool;
+bool checker(){
+	For(i,1,n) {int s=0; For(j,1,n) s+=g[i][j];if(s%2)return false;}
+	return true;
+}
+void euler_cycle(){
+	 tool.push_back(1);
+	while(tool.size()){
+		int u = tool.back();
+		bool ok = false;
+		for(int v=1;v<=n;++v) if(g[u][v]){
+			ok=true;
+			tool.push_back(v);
+			g[u][v]--; g[v][u]--;
+			break;
+		}
+		if(!ok)  { cout<<u<<' '; tool.pop_back(); }
+	};
+}
+int main(){
+	//nenezsnp;
+	ios_base::sync_with_stdio(false);
+	cin>>n>>m;
+	For(i,1,n) {int x;cin>>x;}
+	For(i,1,m){int x,y;cin>>x>>y; g[x][y]++; g[y][x]++; }
+	if (!checker()) cout<<-1;
+		else {
+			cout<<m<<'\n';
+			euler_cycle();
+		}
+}
