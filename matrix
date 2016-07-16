@@ -1,0 +1,45 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define long long long
+const int mod = 1e6+3;
+struct matrix{
+    vector< vector<long> > trix;
+    vector<long>& operator[] (long x) { return trix[x]; }
+    long size(){ return trix.size(); }
+    matrix(int siz){
+        trix.assign(siz, vector<long> (siz,0) );
+        for(int i=0;i<siz;++i) trix[i][i]=1;
+    };
+    matrix(int x,int y){
+        trix.assign(x, vector<long> (y,0));
+    };
+};
+matrix operator*(matrix a,matrix b){
+    int m=a.size(), n=a[0].size(), p=b[0].size();
+    matrix ans(m,p);
+    for(int i=0;i<m;++i){
+        for(int j=0;j<p;++j){
+            for(int k=0;k<n;++k){
+                ans[i][j] = (ans[i][j] + a[i][k]*b[k][j])%mod;
+            }
+        }
+    }
+    return ans;
+}
+matrix operator^(matrix a,long x) {
+    matrix res(a.size());
+    while(x){
+        if(x&1) res=res*a; 
+        x>>=1;
+        a=a*a;
+    }
+    return res;
+}
+void print(matrix A){
+    for(int i=0;i<A.size();++i) for(int j=0;j<A[0].size();++j) cout<<A[i][j]<<(j==A[0].size()-1 ? '\n':' ');
+}
+int main(){
+    matrix b(2,2); 
+    for(int i=0;i<2;++i) for(int j=0;j<2;++j) b[i][j]=2;
+    print(b^2);
+}
