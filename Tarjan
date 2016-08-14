@@ -1,0 +1,30 @@
+#include <bits/stdc++.h>
+#define For(i,a,b) for(int i=(a);i<=(b);++i)
+using namespace std;
+const int N = 100001;
+vector< vector<int> > g;
+int low[N],num[N], cnt, SCC;
+int n,m;
+vector<int> add;
+void dfs(int u){
+    num[u]=low[u]=++cnt; add.push_back(u);
+    for(int i=0;i<g[u].size();++i){int v=g[u][i];
+        if(num[v]) low[u]= min(low[u], num[v]);
+            else {
+                dfs(v); low[u]=min(low[v], low[u]);
+            }
+     }
+     if(low[u] == num[u]){  SCC++;
+        while (add.back() != u) {int v=add.back(); low[v] = num[v] = 2e8; add.pop_back();}
+        low[u]=num[u]=2e8; add.pop_back();
+     }
+}
+int main(){
+    //freopen ("test.inp","r", stdin);
+    cin>>n>>m;  g.assign(n+1, vector<int>());
+    For(i,1,m){
+        int x,y;cin>>x>>y;  g[x].push_back(y);
+    }
+    For(i,1,n) if(!num[i]) dfs(i);
+    cout<<SCC;
+}
