@@ -1,0 +1,48 @@
+/*input
+1 1 -8
+-1 1 -5
+2 3
+*/
+#include <stdio.h>
+#include <iostream>
+#include <math.h>
+using namespace std;
+const int INF  = 1e9;
+#define point pair<int,int>
+#define x first
+#define y second
+point aINF = point(INF,INF), nINF= point(-INF,-INF);
+int dt(int a,int b,int c,int d){ return a*d - b*c;};
+struct line{
+	int a,b,c;
+	line(){};
+	line(int x1,int x2,int x3){a=x1; b=x2; c=x3;};
+};
+point cover(line X , line Y){
+	int ok1 = dt(X.a, X.b, Y.a, Y.b), ok2 = dt(X.b, X.c, Y.b, Y.c), ok3 = dt(X.c, X.a, Y.c, Y.a);
+	if (!ok1 && (ok2 || ok3)) return point(-INF, -INF);
+	if (!ok1 && ok1 == ok2 && ok2 == ok3) return point (INF,INF);
+	return point(ok2/ok1, ok3/ok1);
+}
+bool angle(line X, line Y){
+	if (cover(X,Y) != aINF && cover(X,Y) != nINF) 
+	return (X.a*Y.a + Y.b*X.b)*(X.a*Y.a + Y.b*X.b) == 0;
+	//(X.a*X.a + X.b*X.b) * (Y.a*Y.a + Y.b*Y.b);
+	return false;
+}
+int dis(point A, line Y){
+	// squa
+	return (Y.a*A.x + Y.b*A.y + Y.c) *  (Y.a*A.x + Y.b*A.y + Y.c)/ (Y.a*Y.a + Y.b*Y.b);
+}
+line X,Y;
+point Z;
+int main(){
+	ios_base::sync_with_stdio(false);
+	int x1,x2,x3;
+		cin>>x1>>x2>>x3;	X = line(x1,x2,x3);
+		cin>>x1>>x2>>x3;	Y = line(x1,x2,x3);
+		cin>>x1>>x2;	Z = point(x1,x2);
+	cout<<cover(X,Y).x<<' '<<cover(X,Y).y<<'\n';
+	cout<<angle(X,Y)<<'\n';
+	cout<<dis(Z,X)<<' '<<dis(Z,Y)<<'\n';
+}
