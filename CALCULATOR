@@ -1,0 +1,73 @@
+/*input
+3
+1*2
+2-3*5
+2-15
+*/
+#include <stdio.h>
+#include <iostream>
+#include <vector> 
+#include <queue>
+#include <algorithm>
+#include <map>
+#include <set>
+#define For(i,a,b) for(int i=(a);i<=(b);++i)
+#define rep(i,a,b) for(int i=(a);i<(b);++i)
+using namespace std;
+int ans = 0;
+// cal
+map <char,int> mp;
+struct CAL{ 
+	string cnv(char c){
+		string s; s += c; return s;
+	}
+	int cnvsi(string s){
+		int ans = 0;
+		for(int i=0;i < s.size() ; ++i) ans = ans*10 + s[i] - '0';
+		return ans;
+	}
+	int cal(int a,int b, char c){
+		if (c == '+') return a + b;
+		else if (c == '-') return a-b;
+		return a*b;
+	}
+	int calculator(string s){
+		//convert_rpn(s);
+		vector <string> rpn;
+		vector <char> st;
+		for(int i=0;i<s.size();++i){
+			if (s[i] == ')'){
+				while (st.back() != '(') {
+					rpn.push_back(cnv(st.back())); st.pop_back();
+				}
+				st.pop_back();
+			}
+			else if (s[i] == '(') st.push_back(s[i]);
+			else if (s[i] < '0' || s[i] > '9'){
+				while (st.size() && mp[st.back()] >= mp[s[i]]) {
+					rpn.push_back(cnv(st.back()));	st.pop_back();
+				}
+				st.push_back(s[i]);
+			}
+			else {
+				if (i == 0 || s[i-1] < '0' || s[i-1] > '9') rpn.push_back(cnv(s[i]));
+				else {
+					rpn.back() += s[i];
+				}
+			}
+		}
+		while (st.size()) {rpn.push_back(cnv(st.back())); st.pop_back();}
+		vector <int> cnt;
+		for(int i=0;i<rpn.size();++i) {
+			if (rpn[i][0] >='0' && rpn[i][0] <= '9') {
+				cnt.push_back(cnvsi(rpn[i]));
+			}
+			else {
+				int u = cnt.back(); cnt.pop_back(); 
+				int v = cnt.back(); cnt.pop_back();
+				cnt.push_back(cal(v,u,rpn[i][0]));
+			}
+		} 
+		return cnt[0];
+	};
+} T_U;
