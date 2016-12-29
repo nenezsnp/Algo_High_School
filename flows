@@ -1,0 +1,61 @@
+/*input
+6 8 1 6
+1 2 5
+1 3 5
+2 4 6
+2 5 3
+3 4 3
+3 5 1
+4 6 6
+5 6 6
+*/
+#include <stdio.h>
+#include <iostream>
+#include <cstring>
+#include <queue>
+#define int long long
+using namespace std;
+const int N = 1005;
+int source , sink, n , m;
+int c[N][N], f[N][N];
+int d[N], ptr[N];
+bool bfs(){
+	memset (d , -1 ,sizeof(d));
+	d[source] = 0;
+	queue <int> q; q.push(source);
+	while (q.size()){ int u = q.front(); q.pop();
+		if (u == sink) return true;
+		for(int v=1;v<=n;++v) if (d[v] == -1 && c[u][v] > f[u][v]) {
+			d[v] = d[u]+1; q.push(v); 
+		}
+	}
+	return false;
+}
+
+int dfs(int u,int cur_flows){
+	if (u == sink || !cur_flows) return cur_flows;
+	for(int &v = ptr[u]; v <= n ; ++v){
+		if (d[v] != d[u] + 1) continue;
+		int nxt_flows = dfs(v, min(c[u][v] - f[u][v],cur_flows));
+		if  (nxt_flows){
+			f[u][v] += nxt_flows;
+			f[v][u] -= nxt_flows;
+			return nxt_flows;
+		}
+	}
+	return 0;
+}
+int ans = 0;
+signed main(){
+	ios_base::sync_with_stdio(false);cin.tie(0);
+	cin >> n >> m >> source >> sink;
+	//source = 1, sink = n;
+	for(int i=1;i<=m;++i){
+		int u,v,w;cin >> u >> v >> w;	c[u][v] = max (c[u][v] , w);
+	}
+	while (bfs()){
+		memset (ptr, 0, sizeof(ptr));
+		while (int res = dfs(source, 2e9)) ans += res; 
+	}
+	cout << ans;
+}
