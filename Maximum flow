@@ -1,0 +1,75 @@
+Resources:
++ https://www.geeksforgeeks.org/ford-fulkerson-algorithm-for-maximum-flow-problem/
++ https://www.geeksforgeeks.org/dinics-algorithm-maximum-flow/
+Problems: 
+Finding the maximum possible flow from source to sink. 
+* Ford-Fulkeson algorithm:
+- init flow = 0
+- When still have augumenting flow, increase the flow by +1 
+- return max_flow. 
+--> Complexity: O(max_flow*E) 
+* Optimize:
+Residual graph:
+- indicate additional flow
+- Residual capacity = Init_capacity - current flow. 
+--> use dfs/ bfs to upgrade the flow. 
+*KEEP IN MIND THAT WHEN UPGRADE RESIDUAL GRAPH, YOU NEED TO UPDATE THE OPPOSITE. 
+rgraph[u][v] +-= path_flow.  
+rgraph[v][u] -= path_flow. 
+Sources Edmond - Karp algorithm.
+-----------------------------------------------------------------------------------------
+  while (bfs(source, sink) == true){
+    int path_flow = INF;
+    int u = t; 
+    // start from t to s.
+    for(int v = par[u]){
+      path_flow = min(path_flow;
+      rgraph[u][v]); u =v;
+    }
+    u = t; 
+    for(int v = par[u]) upgrade ( rgraph[u][v] +-= path_flow; rgraph[v][u]-=path_flow.   
+  }
+  -----------------------------------------------------------------------------------------
+--> O(VE^2)
+* Dinic Algorithm:
+-- Difference between Dinic Algorithm and Edmond Karp algorithm: --> BFS: using level graph --> enable us to find 
+more possible flow after bfs.
+Source code: 
+-------------------------------------------------------------------------------------------
+bool bfs(){
+// c[u][v] = capacity of edge(u,v) 
+// f[u][v] = residual flow of edge (u,v) 
+// Find residual graph
+// node u --> v is available <-> c[u][v] - f[u][v] still >= 0. 
+	memset (d , -1 ,sizeof(d));
+	d[source] = 0;
+	queue <int> q; q.push(source);
+	while (q.size()){ int u = q.front(); q.pop();
+		if (u == sink) return true;
+		for(int v=1;v<=n;++v) if (d[v] == -1 && c[u][v] > f[u][v]) {
+			d[v] = d[u]+1; q.push(v); 
+		}
+	}
+	return false;
+}
+
+int dfs(int u,int cur_flows){
+	if (u == sink || !cur_flows) return cur_flows;
+	for(int &v = ptr[u]; v <= n ; ++v){
+		if (d[v] != d[u] + 1) continue;
+		int nxt_flows = dfs(v, min(c[u][v] - f[u][v],cur_flows));
+		if  (nxt_flows){
+			f[u][v] += nxt_flows;
+			f[v][u] -= nxt_flows;
+			return nxt_flows;
+		}
+	}
+	return 0;
+}
+-------------------------------------------------------------------------------------------
+
+After that, all things we need to do is 
+-------------------------------------------------------------------------------------------
+while (bfs(source, sink) == true) if (dfs(s, INF)) ans += dfs(s,INF); 
+-------------------------------------------------------------------------------------------
+Time Complexity : O(EV^2)
