@@ -1,0 +1,72 @@
+#include <bits/stdc++.h>
+#define For(i,a,b) for(int i=(a);i<=(b);++i)
+#define Ford(i,b,a) for(int i=(b);i>=a;--i)
+
+using namespace std;
+const int N = 100001;
+vector< vector<int> > g, G;
+int low[N], st[N], ed[N], depth[N];
+int n,m,a,b,c,g1,g2,cnt ,t, q;
+void dfs(int u,int v,int d){ 
+    low[v]=st[v]=++cnt; depth[v] = d;
+    for(int i=0;i<g[v].size();++i){int vv=g[v][i];
+        if(vv==u) continue;
+        if(st[vv]) low[v]=min(low[v],st[vv]);
+        else {
+            G[v].push_back(vv);
+            dfs(v,vv,d+1); low[v]=min(low[v],low[vv]);
+        }
+    }
+    ed[v] = ++cnt;
+}
+bool des(int a,int b){return (st[a]<=st[b]&&st[b]<=ed[a]);}
+#define Y {cout<<"yes\n"; return; }
+#define N cout<<"no\n"
+void solve1(){
+    cin>>a>>b>>g1>>g2;
+    if(des(g2,g1)) swap(g2,g1);
+    if(depth[g2]!=depth[g1]+1) Y;
+    if(low[g2] < st[g2]) Y;
+    bool x = des(g2,a), y = des(g2,b);
+    if(x==y) Y;
+    N;
+}
+#define mid ((l+r)>>1)
+#define F(i) G[par][(i)]
+int findchild(int par, int desc){
+    int l=0, r= G[par].size()-1;
+    while(l!=mid&&mid!=r){
+        if(st[desc]<= ed[F(mid)]) r=mid;    
+        else l=mid;
+    }
+    For(i,l,r) if(st[desc] <= ed[F(i)]) return F(i);
+    return -1;
+}
+void solve2(){
+    cin>>a>>b>>c;
+    bool x=des(c,a), y=des(c,b);
+    if(!x&&!y) Y;
+    int A = findchild(c,a), B = findchild(c,b);
+    if(!x) if(low[B] < st[c]) Y;
+    if(!y) if(low[A] < st[c]) Y;
+    if(x && y){
+    	if(A==B)Y;
+        if(low[A] < st[c] && low[B] < st[c]) Y;
+    }
+    N;
+}
+int main(){
+/*	freopen ("test.inp","r",stdin);
+	freopen ("test.out","w",stdout);*/
+    ios_base::sync_with_stdio(0);
+    cin>>n>>m; g.assign (n+1, vector<int>() ); G.assign (n+1, vector<int>());
+    For(i,1,m){
+        int x,y;cin>>x>>y;  g[x].push_back(y); g[y].push_back(x);
+    }
+    For(i,1,n) if(!st[i]) dfs(i,i,1);
+    cin>>q;
+    For(i,1,q){
+        cin>>t;
+        if(t==1) solve1();  else solve2();
+    }
+}
