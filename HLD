@@ -1,0 +1,134 @@
+// QTREE
+/*input
+
+*/
+#include <bits/stdc++.h>
+
+#define st first
+#define nd second
+#define For(i,a,b) for (int i=(a),_b=(b);i<=_b;i=i+1)
+#define Ford(i,b,a) for (int i=(b),_a=(a);i>=_a;i=i-1)
+#define mask(i) (1ll << i)
+#define bits(x , i) ((x >> i) & 1)
+#define base 1000000007
+#define pb push_back
+#define mp make_pair
+#define mid ((l+r)>>1)
+#define inf 1e17
+#define long long long
+#define bug(x)  cout<<"bug says:"<<x<<'\n';
+#define nenezsnp cout << "em yeu nene\n"
+
+using namespace std;
+typedef pair<int,int> ii;
+typedef vector<int> vi;
+const int N = 10001;
+int n;
+int lvl[N] , par[N][21];
+int num[N] , cost[N] , forhld[N] , q[N] , child[N] , C[N];
+int numhld = 0;
+int ck[N];
+vector<vector<ii> > a;
+//lca
+int lca(int u,int v){
+    if (lvl[u] < lvl[v]) swap(u,v);
+    Ford(i,15,0)    if(lvl[par[u][i]]>=lvl[v]) u = par[u][i];
+    if(u==v) return v;
+    Ford(i,15,0)    if(par[u][i]!=-1 && par[u][i]!=par[v][i]) u = par[u][i] , v=par[v][i];
+    return par[u][0];
+}
+// hld
+struct HLD{
+    vi chain, seg;
+    int head;
+    void insert(int u){
+        if (chain.size() == 0) head= u;
+        chain.push_back(u);
+        num[u] = chain.size();
+        For(i,1,4)  seg.push_back(0);
+    }
+    void upd(int node,int l,int r, int u,int val){
+        if (l > r || l > u || r< u) return;
+        if (l == r && r == u){
+            seg[node] = val;
+        }
+        else {
+            upd(node*2,l,mid,u,val);
+            upd(node*2+1,mid+1,r,u,val);
+            seg[node] = max(seg[node*2] ,seg[node*2+1]);;
+        } 
+    }
+    int get(int node,int l,int r,int u,int v){
+        if (l > r||l > v || r< u || u > v) return 0;
+        if (u<=l&&r<=v) return seg[node];
+        return max(get(node*2,l,mid,u,v) , get(node*2+1,mid+1,r,u,v));
+    }
+} hld[N];
+void dfs_child(int u,int level){
+    ck[u] = 1;  lvl[u] = level; child[u] = 1;
+    for(int i =0;i<a[u].size();++i){    int v =a[u][i].st;
+        if (ck[v] == 0){
+            par[v][0] = u;
+            dfs_child(v,level+1);
+            child[u] += child[v];
+        }
+    }
+}
+void dfs_hld(int u, int val){
+    hld[numhld].insert(u);  forhld[u] = numhld;
+    C[u] = cost[val];
+    q[val] = u;
+    int sp = -1 , c = 0;
+    for(int i=0;i<a[u].size();++i){ ii v = a[u][i];
+        if (par[v.st][0] == u && (sp==-1 ||child[v.st] >child[sp])) sp = v.st , c = a[u][i].nd;
+    }
+    if (sp!=-1) dfs_hld(sp,c);
+    for(int i=0;i<a[u].size();++i){ ii v = a[u][i];
+        if (par[v.st][0] == u && v.st != sp){
+            numhld++;
+            dfs_hld(v.st , v.nd);
+        }
+    }
+}
+int qry(int u,int v){
+    if (u == v) return 0;
+    int ans = 0;
+    while (forhld[u] != forhld[v])  ans = max (ans , hld[forhld[u]].get(1,1,hld[forhld[u]].chain.size(),1,num[u])) , 
+            u = par[hld[forhld[u]].head][0];
+    ans = max (ans , hld[forhld[u]].get(1,1,hld[forhld[u]].chain.size(),num[v]+1,num[u]));
+    return ans;
+}   
+void process(){
+    memset(ck,0,sizeof(ck));
+    cin>>n; a.assign(n+1,vector<ii>());
+    For(i,1,n-1){
+        int x,y,c;  cin>>x>>y>>c;   cost[i] = c; a[x].push_back(ii(y,i));   a[y].push_back(ii(x,i));
+    }
+    dfs_child(1,1); 
+    par[1][0] = -1;
+    For(i,1,15) For(j,1,n)  if(par[j][i-1] != -1) par[j][i] =par[par[j][i-1]][i-1]; else par[j][i] = -1;
+    dfs_hld(1,0);
+
+    For(i,1,n)  hld[forhld[i]].upd(1,1,hld[forhld[i]].chain.size(),num[i],C[i]);
+
+    string s;
+    int x,y;
+    while (cin>>s){
+        if (s == "DONE")    break;
+        if (s == "CHANGE"){
+                cin>>x>>y;
+                hld[forhld[q[x]]].upd(1,1,hld[forhld[q[x]]].chain.size(),num[q[x]],y);
+        }
+        else {
+            cin>>x>>y;
+            int LCA = lca(x,y);
+            cout << max (qry(x,LCA) , qry(y,LCA)) << '\n';
+        }
+    }
+}
+
+int main(){
+    ios_base::sync_with_stdio(false);cin.tie(0);
+    int t;  cin >> t;
+    while (t--) process();
+}
