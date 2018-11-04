@@ -1,0 +1,33 @@
+//NKSEQ
+#include<bits/stdc++.h>
+
+using namespace std;
+
+#define sp ' '
+#define endl '\n'
+#define st first
+#define nd second
+
+deque<int> dmin;
+int prefix[200001];
+
+int main(){
+    ios_base::sync_with_stdio(0);
+    #ifdef  aloneranger
+        freopen ("f.txt","r" , stdin);
+    #endif // aloneranger
+    int n;  cin >> n;
+    for (int i=1;i<=n;++i){
+        cin >> prefix[i];
+        prefix[n+i] = prefix[i];
+    }
+    int ans = 0;
+    for (int i=1;i<=2*n - 1;++i){
+        prefix[i] += prefix[i-1];
+        while ( dmin.size() && prefix[dmin.back()] > prefix[i] ) dmin.pop_back();
+        dmin.push_back(i);
+        while (dmin.front() <= i -n ) dmin.pop_front();
+        if (i >= n && prefix[ dmin.front() ] - prefix[i-n] > 0) ans++;
+    }
+    cout << ans;
+}
