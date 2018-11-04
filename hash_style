@@ -1,0 +1,51 @@
+/*input
+VSUMSU MSUMSU
+*/
+#include <bits/stdc++.h>
+#define For(i,a,b) for(int i=(a),_b=(b);i<=_b;++i)
+#define Ford(i,b,a) for (int i=(b),_a=(a);i>=_a;i=i-1)
+#define base 1000000009
+#define mid ((l+r)/2)
+#define int long long
+using namespace std;
+const int N = 100100;
+char s[N+5] , t[N*2+5];
+int mul[N+5] , H[2][2*N+5];
+int siz;
+int lr(int type, int l,int r){
+	return (H[type][r] - H[type][l-1]*mul[r-l+1]*1ll + 1ll*base*base)%base ;
+}
+int ck(int be){
+	if (lr(0,1,siz) == lr(1,be+1,be+siz)) return siz;
+	int l = 0 , r = siz-1;
+	while (l!=mid && mid!=r){
+		if (lr(0,1,mid+1) != lr(1,be+1,be+mid+1) ) r = mid;
+		else l = mid;
+	}
+	For(i,l,r){
+		if (lr(0,1,i+1) != lr(1,be+1,be+i+1)){
+			if ( lr(0,i+2,siz) == lr(1,be+i+2,be+siz) ) return 1;
+			return 0;
+		}
+	}
+}
+main(){
+	ios_base::sync_with_stdio(false);
+	scanf("%s", s);
+	scanf("%s", t);
+	siz = strlen(s);
+	for(int i=0;i<siz ;++i) t[i+siz] = t[i];
+	mul[0] = 1;
+	For(i,1,N) mul[i] =(mul[i-1]*29)%base;
+	for(int i=1;i<=siz ;++i){
+		H[0][i] =( H[0][i-1]*29 + (s[i-1]-'A'))% base; 
+	}
+	for(int i=1;i<=2*siz;++i){
+		H[1][i] = ( H[1][i-1]*29 + (t[i-1]-'A'))%base;
+	}
+	int ans = 0;
+	for(int i=0;i<siz ;++i){
+		ans+= ck(i) ;
+	}
+	printf("%lld", ans);
+}
